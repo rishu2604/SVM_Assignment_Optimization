@@ -1,0 +1,108 @@
+```{r}
+library("kernlab")
+```
+
+
+```{r}
+bestAccuracy=0
+bestKernel=""
+bestNu=0
+bestEpsilon=0
+bestSample=0
+kernelList=c("rbfdot","polydot","tanhdot","laplacedot","anovadot","vanilladot")
+```
+```{r}
+
+myData1<-read.csv("C:\\Users\\Rishu Anand\\Downloads\\ai4i2020.csv")
+myData<-as.data.frame(myData1)
+myData<-subset(myData, select= -1:-3)
+myData<-as.data.frame(sapply(myData,as.numeric))
+head(myData)
+
+```
+
+
+```{r}
+fitnessFunction<-function(k,n,e,train,test)
+{
+  
+  trainX=train[,1:5]
+  trainY=as.factor(train[,6:6])
+  
+  testX=test[,1:5]
+  testY=as.factor(test[,6:6])
+  model<-ksvm(as.matrix(trainX),(trainY),kernel=k,nu=n,espilon=e)
+  predicted<-predict(model,testX)
+  
+  accuracy<-sum(as.numeric(predicted)==as.numeric(testY))
+  accuracy<-accuracy/nrow(test)
+  return (round(accuracy,2))
+}
+```
+
+```{r}
+metrics<-data.frame(sample<-c(),iteration<-c(),accuracy<-c(),BestKernel<-c(),BestNu<-c(),BestEpsilon<-c())
+```
+
+```{r}
+
+```
+
+
+```{r}
+for(j in 1:10)
+{
+  sample <- sample(c(TRUE, FALSE), nrow(myData), replace=TRUE, prob=c(0.7,0.3))
+  train  <- myData[sample, ]
+  test   <- myData[!sample, ]
+  for(i in 1:1000)
+  {
+    k=sample(kernelList,1)
+    
+    n=runif(1)
+    e=runif(1)
+    Accuracy=fitnessFunction(k,n,e,train,test)
+    print(Accuracy)
+    newRow<-c(j,i,Accuracy,k,n,e)
+    #print(newRow)
+    metrics<-rbind(metrics,newRow);
+    if(Accuracy>bestAccuracy)
+    {
+      bestKernel=k
+      bestNu=n
+      bestEpsilon=e
+      bestAccuracy=Accuracy;
+      bestSample=j
+    }
+    else{
+      
+    }
+  }
+}
+```
+```{r}
+```
+
+
+```{r}
+colnames(metrics)<-c("sample","iteration","accuracy","kernel","nu","epsilon")
+```
+```{r}
+metrics[which.max(metrics$accuracy),]
+
+```
+```{r}
+plt =metrics[metrics$sample==1,]
+```
+
+```{r}
+plt
+plot(plt$iteration,plt$accuracy,type='l',xlab="Iteration",ylab="Accuracy")
+```
+
+```{r}
+
+```
+```{r}
+
+```
